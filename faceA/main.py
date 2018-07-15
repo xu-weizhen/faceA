@@ -12,6 +12,8 @@ from faceA.ui.ui_base.Form_main import Ui_Form_main
 from faceA.ui.Dia_alter import Alter_Dialog
 from faceA.ui.Dia_doAllFile import DoAllFile_Dialog
 
+from PIL import Image
+from PIL import ImageDraw
 
 class mainD(QWidget):
     def __init__(self):
@@ -104,7 +106,7 @@ class mainD(QWidget):
             Alter_Dialog("警报", "请选择jpg或者png文件").exec_()
         else:
             try:
-                self.showResult(MyUtils.getPicAnalysisResult(self.picpath))
+                self.showResult(MyUtils.getPicAnalysisResult(self.picpath), self.picpath)
                 MyUtils.getLogger(__name__).info("展示图片分析结果" + self.picpath)
             except Exception as e:
                 Alter_Dialog(e.__str__()).exec()
@@ -126,7 +128,7 @@ class mainD(QWidget):
     def showPicAndResult_connect(self, pic, result, picpath):
         self.ui.label.setPixmap(pic)
         self.picpath = picpath
-        self.showResult(result)
+        self.showResult(result, picpath)
         self.picnum_haveshow += 1
         MyUtils.getLogger(__name__).info("展示图片及其结果"+picpath)
         self.ui.label_4.setText(str(self.picnum_haveshow) + "/" + str(self.picnum_toshow))
@@ -173,7 +175,7 @@ class mainD(QWidget):
         dfb.ui.pushButton.show()
 
     # 这个函数被两个内部函数用到了,在这里写网络请求重试，如果结果是错误，则在这里会进行一次补救
-    def showResult(self, result):
+    def showResult(self, result, picpath):
 
         resultobj = None
         try:
@@ -197,23 +199,23 @@ class mainD(QWidget):
             return
 
         text = ''
-        j = 0
+        j = 1
         try:
             for i in resultobj['faces']:
                 text += "人物" + str(j) + ":\n"
                 j += 1
                 att = i['attributes']
-                text += "age: " + str(att['age']['value'])
+                text += "年龄: " + str(att['age']['value'])
                 text += "\n性别: " + ("女" if att['gender']['value'] == "Female" else "男")
                 text += "\n人种: "
-                if att['ethnicity']['value'] == 'None':
+                if att['ethnicity']['value'] == 'ASIAN' or att['ethnicity']['value'] == 'Asian':
                     text += "亚洲人"
                 elif att['ethnicity']['value'] == 'White':
                     text += "白人"
                 else:
                     text += "黑人"
 
-                text += "\n笑容程度: " + str(att['smile']['value']) + "\t阈值：" + str(att['smile']['threshold']) + "\n"
+                text += "\n笑容程度: " + str(att['smile']['value']) + "\n"
                 if att['glass']['value'] == 'None':
                     text += "没有佩戴眼镜"
                 elif att['glass']['value'] == 'Dark':
@@ -221,6 +223,29 @@ class mainD(QWidget):
                 else:
                     text += "佩戴普通眼镜"
                 text += '\n'
+
+                point_y = i['face_rectangle']['top']
+                point_x = i['face_rectangle']['left']
+                height = i['face_rectangle']['height']
+                width = i['face_rectangle']['width']
+                point1 = (point_x, point_y)
+                point2 = (point_x + width, point_y)
+                point3 = (point_x, point_y + height)
+                point4 = (point_x + width, point_y + height)
+
+                img = Image.open(picpath)
+                imgd = ImageDraw.Draw(img)
+                imgd.line([point1, point2, point4, point3, point1], fill=(0, 255, 0), width=5)
+                img.show()
+
+                '''
+                !!!
+                目前存在的问题：
+                1.图片中有多个人脸时会显示多张人脸边框图片
+                2.带人脸边框的图片无法显示到控件中
+                3.主界面按钮中文字显示不全
+                '''
+
         except Exception as e:
             MyUtils.getLogger(__name__).error(e.__class__ + e.__str__())
 
