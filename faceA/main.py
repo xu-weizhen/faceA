@@ -200,6 +200,8 @@ class mainD(QWidget):
 
         text = ''
         j = 1
+        img = Image.open(picpath)
+        imgd = ImageDraw.Draw(img)
         try:
             for i in resultobj['faces']:
                 text += "人物" + str(j) + ":\n"
@@ -233,22 +235,19 @@ class mainD(QWidget):
                 point3 = (point_x, point_y + height)
                 point4 = (point_x + width, point_y + height)
 
-                img = Image.open(picpath)
-                imgd = ImageDraw.Draw(img)
                 imgd.line([point1, point2, point4, point3, point1], fill=(0, 255, 0), width=5)
-                img.show()
 
                 '''
                 !!!
                 目前存在的问题：
-                1.图片中有多个人脸时会显示多张人脸边框图片
-                2.带人脸边框的图片无法显示到控件中
-                3.主界面按钮中文字显示不全
+                1.带人脸边框的图片无法显示到控件中
+                2.主界面按钮中文字显示不全
                 '''
 
         except Exception as e:
             MyUtils.getLogger(__name__).error(e.__class__ + e.__str__())
-
+            
+        img.show()
         self.ui.label_2.setText(text)
 
 
