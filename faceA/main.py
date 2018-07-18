@@ -47,7 +47,7 @@ class mainD(QWidget):
     def ShowResult_border(self):
         b_len = len(self.picpath) - 1
         for b_len in range (b_len, 0, -1):
-            if (self.picpath[b_len] == '/'):
+            if (self.picpath[b_len] == '/' and self.picpath[b_len-1] == 'A' and self.picpath[b_len-2] == 'e'):
                 break
         picpath_b = self.picpath[0:b_len + 1]
         picpath_b = picpath_b + "result_b.jpg"
@@ -59,9 +59,16 @@ class mainD(QWidget):
 
         # 按与控件的比例，对图像进行缩放
         if png.width() / png.height() > self.ui.label.width() / self.ui.label.height():
-            png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
+            if png.width() < self.ui.label.width():
+                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            else:
+                png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
         else:
-            png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            if png.height() < self.ui.label.height():
+                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            else:
+                png = png.scaled(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+
         # 把图像放到控件中显示
         MyUtils.getLogger(__name__).info("展示图片" + self.picpath)
         self.ui.label.setPixmap(png)
@@ -70,7 +77,7 @@ class mainD(QWidget):
     def ShowResult_point(self):
         b_len = len(self.picpath) - 1
         for b_len in range (b_len, 0, -1):
-            if (self.picpath[b_len] == '/'):
+            if (self.picpath[b_len] == '/' and self.picpath[b_len-1] == 'A' and self.picpath[b_len-2] == 'e'):
                 break
         picpath_b = self.picpath[0:b_len + 1]
         picpath_b = picpath_b + "result_p.jpg"
@@ -82,9 +89,16 @@ class mainD(QWidget):
 
         # 按与控件的比例，对图像进行缩放
         if png.width() / png.height() > self.ui.label.width() / self.ui.label.height():
-            png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
+            if png.width() < self.ui.label.width():
+                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            else:
+                png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
         else:
-            png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            if png.height() < self.ui.label.height():
+                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            else:
+                png = png.scaled(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+
         # 把图像放到控件中显示
         MyUtils.getLogger(__name__).info("展示图片" + self.picpath)
         self.ui.label.setPixmap(png)
@@ -143,9 +157,16 @@ class mainD(QWidget):
 
         # 按与控件的比例，对图像进行缩放
         if png.width() / png.height() > self.ui.label.width() / self.ui.label.height():
-            png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
+            if png.width() < self.ui.label.width():
+                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            else:
+                png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
         else:
-            png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            if png.height() < self.ui.label.height():
+                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+            else:
+                png = png.scaled(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
+
         # 把图像放到控件中显示
         MyUtils.getLogger(__name__).info("展示图片"+self.picpath)
         self.ui.label.setPixmap(png)
@@ -259,11 +280,11 @@ class mainD(QWidget):
                 j += 1
                 att = i['attributes']
                 text += "年龄: " + str(att['age']['value'])
-                text += "\n性别: " + ("女" if att['gender']['value'] == "Female" else "男")
+                text += "\n性别: " + ("女" if att['gender']['value'] == "Female" or att['gender']['value'] == "FEMALE" else "男")
                 text += "\n人种: "
                 if att['ethnicity']['value'] == 'ASIAN' or att['ethnicity']['value'] == 'Asian':
                     text += "亚洲人"
-                elif att['ethnicity']['value'] == 'White':
+                elif att['ethnicity']['value'] == 'WHITE' or att['ethnicity']['value'] == 'White':
                     text += "白人"
                 else:
                     text += "黑人"
@@ -352,9 +373,16 @@ class showFileThread(QThread):
                         else:
                             # 按与控件的比例，对图像进行缩放
                             if pic.width() / pic.height() > self.wid / self.he:
-                                pic = pic.scaled(self.wid, pic.height() * self.wid / pic.width())
+                                if pic.width() < self.wid:
+                                    pic = pic.scaledToHeight(pic.width() * self.he / pic.height(), self.he)
+                                else:
+                                    pic = pic.scaled(self.wid, pic.height() * self.wid / pic.width())
                             else:
-                                pic = pic.scaledToHeight(pic.width() * self.he / pic.height(), self.he)
+                                if pic.height() < self.he:
+                                    pic = pic.scaledToHeight(pic.width() * self.he / pic.height(), self.he)
+                                else:
+                                    pic = pic.scaled(pic.width() * self.he / pic.height(), self.he)
+
                         try:
                             file = open(filepath[:-4] + '.json')
                             result = file.read()
@@ -376,12 +404,12 @@ if __name__ == '__main__':
     ex.show()
     sys.exit(app.exec_())
 
-
 """
 @author:raymond
 @file:main.py
 @time:2018/1/1611:45
 
-@modify:XuWeizhen
-@time:2018/7/17 23:00
+@xuweizhen
+@file:main.py
+@time:2018/7/19 00:15
 """
