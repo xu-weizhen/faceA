@@ -15,7 +15,6 @@ from faceA.ui.Dia_doAllFile import DoAllFile_Dialog
 from PIL import Image
 from PIL import ImageDraw
 
-
 class mainD(QWidget):
     def __init__(self):
         super().__init__()
@@ -32,8 +31,6 @@ class mainD(QWidget):
         self.ui.pushButton_5.clicked.connect(self.doAllFile_button_connect)
         self.ui.pushButton_6.clicked.connect(self.showAllResults_button_connect)
         self.ui.pushButton_7.clicked.connect(self.stopShowResult_button_connect)
-        self.ui.pushButton_b.clicked.connect(self.ShowResult_border)
-        self.ui.pushButton_p.clicked.connect(self.ShowResult_point)
 
         # 初始化一些要用到的变量
         self.picpath = ''
@@ -43,66 +40,6 @@ class mainD(QWidget):
         self.undoPath = r'.\resource\pic_undo'
         self.havedonedPath = r'.\resource\pic_havedone'
         self.doallfilethread = None
-
-    def ShowResult_border(self):
-        b_len = len(self.picpath) - 1
-        for b_len in range (b_len, 0, -1):
-            if (self.picpath[b_len] == '/' and self.picpath[b_len-1] == 'A' and self.picpath[b_len-2] == 'e'):
-                break
-        picpath_b = self.picpath[0:b_len + 1]
-        picpath_b = picpath_b + "result_b.jpg"
-        png = QPixmap(picpath_b)
-
-        if png.isNull():
-            Alter_Dialog("警报", "图片转换出现错误").exec_()
-            return
-
-        # 按与控件的比例，对图像进行缩放
-        if png.width() / png.height() > self.ui.label.width() / self.ui.label.height():
-            if png.width() < self.ui.label.width():
-                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-            else:
-                png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
-        else:
-            if png.height() < self.ui.label.height():
-                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-            else:
-                png = png.scaled(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-
-        # 把图像放到控件中显示
-        MyUtils.getLogger(__name__).info("展示图片" + self.picpath)
-        self.ui.label.setPixmap(png)
-        return
-
-    def ShowResult_point(self):
-        b_len = len(self.picpath) - 1
-        for b_len in range (b_len, 0, -1):
-            if (self.picpath[b_len] == '/' and self.picpath[b_len-1] == 'A' and self.picpath[b_len-2] == 'e'):
-                break
-        picpath_b = self.picpath[0:b_len + 1]
-        picpath_b = picpath_b + "result_p.jpg"
-        png = QPixmap(picpath_b)
-
-        if png.isNull():
-            Alter_Dialog("警报", "图片转换出现错误").exec_()
-            return
-
-        # 按与控件的比例，对图像进行缩放
-        if png.width() / png.height() > self.ui.label.width() / self.ui.label.height():
-            if png.width() < self.ui.label.width():
-                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-            else:
-                png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
-        else:
-            if png.height() < self.ui.label.height():
-                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-            else:
-                png = png.scaled(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-
-        # 把图像放到控件中显示
-        MyUtils.getLogger(__name__).info("展示图片" + self.picpath)
-        self.ui.label.setPixmap(png)
-        return
 
     def showAllResults_button_connect(self):
         if not self.doallfilethread == None:
@@ -157,16 +94,9 @@ class mainD(QWidget):
 
         # 按与控件的比例，对图像进行缩放
         if png.width() / png.height() > self.ui.label.width() / self.ui.label.height():
-            if png.width() < self.ui.label.width():
-                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-            else:
-                png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
+            png = png.scaled(self.ui.label.width(), png.height() * self.ui.label.width() / png.width())
         else:
-            if png.height() < self.ui.label.height():
-                png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-            else:
-                png = png.scaled(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
-
+            png = png.scaledToHeight(png.width() * self.ui.label.height() / png.height(), self.ui.label.height())
         # 把图像放到控件中显示
         MyUtils.getLogger(__name__).info("展示图片"+self.picpath)
         self.ui.label.setPixmap(png)
@@ -270,21 +200,17 @@ class mainD(QWidget):
 
         text = ''
         j = 1
-        imgb = Image.open(picpath)
-        imgp = Image.open(picpath)
-        imgdb = ImageDraw.Draw(imgb)
-        imgdp = ImageDraw.Draw(imgp)
         try:
             for i in resultobj['faces']:
                 text += "人物" + str(j) + ":\n"
                 j += 1
                 att = i['attributes']
                 text += "年龄: " + str(att['age']['value'])
-                text += "\n性别: " + ("女" if att['gender']['value'] == "Female" or att['gender']['value'] == "FEMALE" else "男")
+                text += "\n性别: " + ("女" if att['gender']['value'] == "Female" else "男")
                 text += "\n人种: "
                 if att['ethnicity']['value'] == 'ASIAN' or att['ethnicity']['value'] == 'Asian':
                     text += "亚洲人"
-                elif att['ethnicity']['value'] == 'WHITE' or att['ethnicity']['value'] == 'White':
+                elif att['ethnicity']['value'] == 'White':
                     text += "白人"
                 else:
                     text += "黑人"
@@ -307,37 +233,23 @@ class mainD(QWidget):
                 point3 = (point_x, point_y + height)
                 point4 = (point_x + width, point_y + height)
 
-                imgdb.line([point1, point2, point4, point3, point1], fill=(0, 255, 0), width=5)
+                img = Image.open(picpath)
+                imgd = ImageDraw.Draw(img)
+                imgd.line([point1, point2, point4, point3, point1], fill=(0, 255, 0), width=5)
+                img.show()
 
-                left_eye_x = i['landmark']['left_eye_center']['x']
-                left_eye_y = i['landmark']['left_eye_center']['y']
-                left_eye_point = (left_eye_x - 3, left_eye_y - 3, left_eye_x + 3, left_eye_y + 3)
-                imgdp.ellipse(left_eye_point, fill='blue')
-
-                right_eye_x = i['landmark']['right_eye_center']['x']
-                right_eye_y = i['landmark']['right_eye_center']['y']
-                right_eye_point = (right_eye_x - 3, right_eye_y - 3, right_eye_x + 3, right_eye_y + 3)
-                imgdp.ellipse(right_eye_point, fill='blue')
-
-                mouth_x = i['landmark']['mouth_lower_lip_top']['x']
-                mouth_y = i['landmark']['mouth_lower_lip_top']['y']
-                mouth_point = (mouth_x - 3, mouth_y - 3, mouth_x + 3, mouth_y + 3)
-                imgdp.ellipse(mouth_point, fill='blue')
-
-                nose_x = i['landmark']['nose_tip']['x']
-                nose_y = i['landmark']['nose_tip']['y']
-                nose_point = (nose_x - 3, nose_y - 3, nose_x + 3, nose_y + 3)
-                imgdp.ellipse(nose_point, fill='blue')
+                '''
+                !!!
+                目前存在的问题：
+                1.图片中有多个人脸时会显示多张人脸边框图片
+                2.带人脸边框的图片无法显示到控件中
+                3.主界面按钮中文字显示不全
+                '''
 
         except Exception as e:
             MyUtils.getLogger(__name__).error(e.__class__ + e.__str__())
 
-        imgb.save("result_b.jpg")
-        imgp.save("result_p.jpg")
-        # img.show()
         self.ui.label_2.setText(text)
-        self.ui.pushButton_p.setDisabled(False)
-        self.ui.pushButton_b.setDisabled(False)
 
 
 # 展示文件线程
@@ -373,16 +285,9 @@ class showFileThread(QThread):
                         else:
                             # 按与控件的比例，对图像进行缩放
                             if pic.width() / pic.height() > self.wid / self.he:
-                                if pic.width() < self.wid:
-                                    pic = pic.scaledToHeight(pic.width() * self.he / pic.height(), self.he)
-                                else:
-                                    pic = pic.scaled(self.wid, pic.height() * self.wid / pic.width())
+                                pic = pic.scaled(self.wid, pic.height() * self.wid / pic.width())
                             else:
-                                if pic.height() < self.he:
-                                    pic = pic.scaledToHeight(pic.width() * self.he / pic.height(), self.he)
-                                else:
-                                    pic = pic.scaled(pic.width() * self.he / pic.height(), self.he)
-
+                                pic = pic.scaledToHeight(pic.width() * self.he / pic.height(), self.he)
                         try:
                             file = open(filepath[:-4] + '.json')
                             result = file.read()
@@ -408,8 +313,6 @@ if __name__ == '__main__':
 @author:raymond
 @file:main.py
 @time:2018/1/1611:45
-
-@xuweizhen
-@file:main.py
-@time:2018/7/19 00:06
+@modify:XuWeizhen
+@time:2018/7/15 11:30
 """
