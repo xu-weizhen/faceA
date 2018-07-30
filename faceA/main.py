@@ -286,8 +286,12 @@ class mainD(QWidget):
                     text += "亚洲人"
                 elif att['ethnicity']['value'] == 'WHITE' or att['ethnicity']['value'] == 'White':
                     text += "白人"
-                else:
+                elif att['ethnicity']['value'] == 'INDIA' or att['ethnicity']['value'] == 'india':
+                    text += "印度人"
+                elif att['ethnicity']['value'] == 'BLACK' or att['ethnicity']['value'] == 'black':
                     text += "黑人"
+                else:
+                    text += att['ethnicity']['value']
 
                 text += "\n笑容程度: " + str(att['smile']['value']) + "\n"
                 if att['glass']['value'] == 'None':
@@ -296,7 +300,7 @@ class mainD(QWidget):
                     text += "佩戴墨镜"
                 else:
                     text += "佩戴普通眼镜"
-                text += '\n'
+                text += '\n\n'
 
                 point_y = i['face_rectangle']['top']
                 point_x = i['face_rectangle']['left']
@@ -307,7 +311,7 @@ class mainD(QWidget):
                 point3 = (point_x, point_y + height)
                 point4 = (point_x + width, point_y + height)
 
-                imgdb.line([point1, point2, point4, point3, point1], fill=(0, 255, 0), width=5)
+                imgdb.line([point1, point2, point4, point3, point1], fill=(0, 0, 255), width=5)
 
                 left_eye_x = i['landmark']['left_eye_center']['x']
                 left_eye_y = i['landmark']['left_eye_center']['y']
@@ -319,8 +323,18 @@ class mainD(QWidget):
                 right_eye_point = (right_eye_x - 3, right_eye_y - 3, right_eye_x + 3, right_eye_y + 3)
                 imgdp.ellipse(right_eye_point, fill='blue')
 
-                mouth_x = i['landmark']['mouth_lower_lip_top']['x']
-                mouth_y = i['landmark']['mouth_lower_lip_top']['y']
+                # mouth_x = i['landmark']['mouth_lower_lip_top']['x']
+                # mouth_y = i['landmark']['mouth_lower_lip_top']['y']
+                # mouth_point = (mouth_x - 3, mouth_y - 3, mouth_x + 3, mouth_y + 3)
+                # imgdp.ellipse(mouth_point, fill='blue')
+
+                mouth_x = i['landmark']['mouth_left_corner']['x']
+                mouth_y = i['landmark']['mouth_left_corner']['y']
+                mouth_point = (mouth_x - 3, mouth_y - 3, mouth_x + 3, mouth_y + 3)
+                imgdp.ellipse(mouth_point, fill='blue')
+
+                mouth_x = i['landmark']['mouth_right_corner']['x']
+                mouth_y = i['landmark']['mouth_right_corner']['y']
                 mouth_point = (mouth_x - 3, mouth_y - 3, mouth_x + 3, mouth_y + 3)
                 imgdp.ellipse(mouth_point, fill='blue')
 
